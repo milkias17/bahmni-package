@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 if [ -f /etc/bahmni-installer/bahmni.conf ]; then
 . /etc/bahmni-installer/bahmni.conf
@@ -18,7 +19,6 @@ sudo ln -s /opt/openmrs/log /var/log/openmrs
 if [ "${IS_PASSIVE:-0}" -ne "1" ]; then
     (cd /opt/openmrs/openmrs && scripts/initDB.sh)
 fi
-chkconfig --add openmrs
 
 #copy configs
 sudo mkdir -p /opt/openmrs/openmrs/WEB-INF/classes/ && cp /opt/openmrs/etc/log4j.xml /opt/openmrs/openmrs/WEB-INF/classes/
@@ -50,7 +50,8 @@ run_migrations() {
 #}
 
 create_configuration_dirs() {
-    [ -d /home/$OPENMRS_SERVER_USER/.OpenMRS ] || mkdir /home/$OPENMRS_SERVER_USER/.OpenMRS
+    [ -d /home/$OPENMRS_SERVER_USER/.OpenMRS ] || mkdir -p /home/$OPENMRS_SERVER_USER/.OpenMRS
+
     chown -R bahmni:bahmni /home/$OPENMRS_SERVER_USER/.OpenMRS
 
     ln -s /opt/openmrs/bahmnicore.properties /home/$OPENMRS_SERVER_USER/.OpenMRS/bahmnicore.properties
@@ -72,8 +73,8 @@ create_configuration_dirs() {
 }
 
 setupConfFiles() {
-    	rm -f /etc/httpd/conf.d/emr_ssl.conf
-    	cp -f /opt/openmrs/etc/emr_ssl.conf /etc/httpd/conf.d/emr_ssl.conf
+    	rm -f /etc/apache2/conf-available/emr_ssl.conf
+    	cp -f /opt/openmrs/etc/emr_ssl.conf /etc/apache2/conf-available/emr_ssl.conf
 }
 
 create_configuration_dirs

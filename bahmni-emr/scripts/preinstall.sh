@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 
 rm -rf /opt/openmrs
@@ -14,13 +15,8 @@ rm -f /etc/httpd/conf.d/emr_ssl.conf
 #create bahmni user and group if doesn't exist
 USERID=bahmni
 GROUPID=bahmni
-/bin/id -g $GROUPID 2>/dev/null
-[ $? -eq 1 ]
-groupadd bahmni
-
-/bin/id $USERID 2>/dev/null
-[ $? -eq 1 ]
-useradd -g bahmni bahmni
+getent group "$GROUPID" >/dev/null || groupadd "$GROUPID"
+getent passwd "$USERID" >/dev/null || useradd -g "$GROUPID" "$USERID"
 
 mkdir -p /bahmni_temp/logs
 chown -R bahmni:bahmni /bahmni_temp
